@@ -2,7 +2,6 @@
 
 
 class ModbusClientException(Exception):
-    # base class
     pass
 
 class UnknownDatatypeException(ModbusClientException):
@@ -12,4 +11,11 @@ class ReadError(ModbusClientException):
     pass
 
 class FunctioncodeException(ModbusClientException):
+    pass
+
+
+class ParserException(Exception):
+    pass
+
+class InfluxError(Exception):
     pass
