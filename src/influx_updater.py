@@ -255,7 +255,6 @@ class InfluxUpdater():
             if (not self.__influx_client.write_points(data_points_list)):
                 self.__logger.error('Cannot write to influx...')
             data_points_list.clear()
-        self.__logger.info('Data successfully wrote to influx...')
 
 
     def __main_task(self):
