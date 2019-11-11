@@ -234,9 +234,9 @@ class InfluxUpdater():
                 try:
                     value = energy_meter.get_register_data(address=address, datatype=datatype, functioncode=functioncode)
                 except (FunctioncodeException, ReadError, UnknownDatatypeException) as err:
-                    self.__logger.error('Client: {0}, Host: {1}, Port: {2}, Slaveaddress: {3} => ModbusClientException: {4}'.format(
+                    self.__logger.error('Client: {0}, Host: {1}, Port: {2}, Slaveaddress: {3} => ModbusClientException: {4} ({5})'.format(
                                                 energy_meter.get_client_id(), energy_meter.get_host(), energy_meter.get_port(),
-                                                energy_meter.get_slaveaddress(), err))
+                                                energy_meter.get_slaveaddress(), err, measurement))
 
 
 
