@@ -159,7 +159,7 @@ class InfluxUpdater():
     def __scheduler_config(self):
         self.__scheduler = BackgroundScheduler()
         params = self.__get_config('scheduler')
-        self.__main_job = self.__scheduler.add_job(**params, func=self.__update_influx, trigger='cron')
+        self.__main_job = self.__scheduler.add_job(**params, func=self.__main_task, trigger='cron')
 
 
 
@@ -233,30 +233,36 @@ class InfluxUpdater():
 
                 try:
                     value = energy_meter.get_register_data(address=address, datatype=datatype, functioncode=functioncode)
+                    data_point = {
+                        'measurement': str(measurement),
+                        'tags': {
+                            'dataunit': str(dataunit),
+                            'energy_meter': str(energy_meter.get_type()),
+                            'description': str(energy_meter.get_description()),
+                            'client_id': str(energy_meter.get_client_id())
+                        },
+                        "fields": {
+                            "value": value
+                        }
+                    }
+                    data_points_list.append(data_point)
                 except (FunctioncodeException, ReadError, UnknownDatatypeException) as err:
                     self.__logger.error('Client: {0}, Host: {1}, Port: {2}, Slaveaddress: {3} => ModbusClientException: {4} ({5})'.format(
                                                 energy_meter.get_client_id(), energy_meter.get_host(), energy_meter.get_port(),
                                                 energy_meter.get_slaveaddress(), err, measurement))
 
 
-
-                data_point = {
-                    'measurement': str(measurement),
-                    'tags': {
-                        'dataunit': str(dataunit),
-                        'energy_meter': str(energy_meter.get_type()),
-                        'description': str(energy_meter.get_description()),
-                        'client_id': str(energy_meter.get_client_id())
-                    },
-                    "fields": {
-                        "value": value
-                    }
-                }
-                data_points_list.append(data_point)
             if (not self.__influx_client.write_points(data_points_list)):
                 self.__logger.error('Cannot write to influx...')
             data_points_list.clear()
         self.__logger.info('Data successfully wrote to influx...')
+
+
+    def __main_task(self):
+        try:
+            self.__update_influx()
+        except Exception as exc:
+            self.__logger.error('Unusual exception: ' + str(exc))
 
 
     def start(self):
