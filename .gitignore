@@ -1,5 +1,7 @@
 .DS_Store
 .vscode
 .idea
-__pycache__
-info.log
+src/__pycache__
+src/info.log
+src/config.ini
+env
