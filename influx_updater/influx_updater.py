@@ -137,8 +137,6 @@ class InfluxUpdater():
         self.__config_file = config_file
         self.__log_file = log_file
         self.__logger_config()
-        self.__connect_influx()
-        self.__connect_psql()
         self.__scheduler_config()
 
 
@@ -153,14 +151,14 @@ class InfluxUpdater():
 
         self.__logger.addHandler(file_handler)
         self.__logger.addHandler(stream_handler)
-        self.__logger.setLevel(logging.INFO)
+        self.__logger.setLevel(logging.DEBUG)
 
 
     def __scheduler_config(self):
         self.__scheduler = BackgroundScheduler()
         params = self.__get_config('scheduler')
         self.__main_job = self.__scheduler.add_job(**params, func=self.__main_task, trigger='cron')
-
+        self.__logger.debug('Configured scheduler...')
 
 
     def __get_config(self, section):
@@ -183,43 +181,74 @@ class InfluxUpdater():
             params = self.__get_config('influx')
             self.__influx_client = InfluxDBClient(**params, timeout=10)
             self.__influx_client.request(url='ping', expected_response_code=204)
-            self.__logger.info('Successfully connected to influx...')
+            self.__logger.debug('Successfully connected to influx...')
         except (ParserException, ConnectionError, Exception) as err:
             self.__logger.error(err)
 
+    def __disconnect_influx(self):
+        self.__influx_client.close()
+        self.__logger.debug('Successfully disconnected from influx...')
+
 
     def __connect_psql(self):
-        self.__psql_client = None
-        try:
-            params = self.__get_config('psql')
-            self.__psql_client = psycopg2.connect(**params)
-            self.__logger.info('Successfully connected to psql...')
-        except (Exception, DatabaseError) as err:
-            self.__logger.error(err)
+        params = self.__get_config('psql')
+        self.__psql_client = psycopg2.connect(**params)
+        self.__logger.debug('Successfully connected to psql...')
+
+
+    def __disconnect_psql(self):
+        self.__psql_client.close()
+        self.__logger.debug('Successfully disconnected from psql...')
+
 
 
     def __get_energy_meters(self):
         self.__energy_meters = []
+        query = 'SELECT * FROM energy_meters;'
 
-        cursor = self.__psql_client.cursor()
-        cursor.execute('SELECT * FROM energy_meters;')
-        for energy_meter_data in cursor.fetchall():
-            new_modbus_client = ModbusClient(host=energy_meter_data[1], port=energy_meter_data[2], slaveaddress=energy_meter_data[3])
-            new_energy_meter = EnergyMeter(client_id=energy_meter_data[0], type=energy_meter_data[4], description=energy_meter_data[5], modbus_client=new_modbus_client)
-            self.__energy_meters.append(new_energy_meter)
+        try:
+            self.__connect_psql()
+            cursor = self.__psql_client.cursor()
+            cursor.execute(query)
+        except (Exception, DatabaseError, ParserException) as err:
+            self.__logger.error(err)
+        else:
+            for energy_meter_data in cursor.fetchall():
+                new_modbus_client = ModbusClient(host=energy_meter_data[1], port=energy_meter_data[2], slaveaddress=energy_meter_data[3])
+                new_energy_meter = EnergyMeter(client_id=energy_meter_data[0], type=energy_meter_data[4], description=energy_meter_data[5], modbus_client=new_modbus_client)
+                self.__energy_meters.append(new_energy_meter)
+            cursor.close()
+            self.__disconnect_psql()
+
+        if(not self.__energy_meters):
+            self.__logger.debug('Energy meter list is empty...')
+        else:
+            self.__logger.debug('Updated energy meter list...')
+
+
 
 
     def __get_registers(self, energy_meter_type):
-        cursor = self.__psql_client.cursor()
-        query = 'SELECT registers.address, registers.measurement, registers.dataunit, registers.datatype, registers.functioncode FROM registers WHERE registers.energy_meter_id = \'' + str(energy_meter_type) + '\';'
-        cursor.execute(query)
-        data = cursor.fetchall()
-        cursor.close()
+        query = 'SELECT registers.address, registers.measurement, registers.dataunit, registers.datatype, registers.functioncode FROM registers ' \
+                'WHERE registers.energy_meter_id = \'{0}\';'.format(energy_meter_type)
+
+        try:
+            self.__connect_psql()
+            cursor = self.__psql_client.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        except (Exception, DatabaseError, ParserException) as err:
+            self.__logger.error(err)
+        else:
+            cursor.close()
+        self.__disconnect_psql()
         return data
 
 
     def __update_influx(self):
         self.__get_energy_meters()
+        self.__connect_influx()
+
         for energy_meter in self.__energy_meters:
             registers = self.__get_registers(energy_meter.get_type())
             data_points_list = []
@@ -241,8 +270,8 @@ class InfluxUpdater():
                             'description': str(energy_meter.get_description()),
                             'client_id': str(energy_meter.get_client_id())
                         },
-                        "fields": {
-                            "value": value
+                        'fields': {
+                            'value': value
                         }
                     }
                     data_points_list.append(data_point)
@@ -250,11 +279,14 @@ class InfluxUpdater():
                     self.__logger.error('Client: {0}, Host: {1}, Port: {2}, Slaveaddress: {3} => ModbusClientException: {4} ({5})'.format(
                                                 energy_meter.get_client_id(), energy_meter.get_host(), energy_meter.get_port(),
                                                 energy_meter.get_slaveaddress(), err, measurement))
-
+            self.__logger.debug('Got values from {0}'.format(energy_meter.get_host()))
 
             if (not self.__influx_client.write_points(data_points_list)):
                 self.__logger.error('Cannot write to influx...')
             data_points_list.clear()
+            self.__logger.debug('Updated influx with data from {0}'.format(energy_meter.get_host()))
+
+        self.__disconnect_influx()
 
 
     def __main_task(self):
@@ -266,6 +298,7 @@ class InfluxUpdater():
 
     def start(self):
         self.__scheduler.start()
+        self.__logger.info('Program started...')
         while(True):
             time.sleep(1)
 
