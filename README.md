@@ -32,25 +32,33 @@ docker-compose stop
 
 ## Configuration
 Information about devices (energy_meters) and registers are stored in PostgreSQL database that can be managed via any 
-postgres client. By default, database comes with predefined virtual modbustcp server record and its register. Virtual modbustcp server
-is another container running in docker-compose which provides random data and helps test behaviour of the system when any other
-physical meter is not yet connected. Feel free to delete that records if not needed.
+postgres client. By default, database comes with predefined virtual modbustcp server record and its register (**bold** in example below). Virtual modbustcp server is another container running in docker-compose which provides random data and helps test behaviour of the system when any other physical meter is not yet connected. Feel free to delete that records if not needed.
 
 ### Structure of tables in database
 
 Energy meters:
 | host | port | slave_address | type | description |
 | ---- | ---- | ------------- | ---- | ----------- |
-| virtual_modbustcp_server | 502 | 0 | virtual_modbustcp | test_energy_meter |
+| **virtual_modbustcp_server** | **502** | **0** | **virtual_modbustcp** | **test_energy_meter** |
+| 192.168.1.113 | 502 | 1 | sdm630 | example |
+| remote_with_open_ports | 8502 | 1 | sdm630 | example | 
 
 Registers:
 | type | register_address | measurement_name | data_unit | data_type | function_code |
 | ---- | ---------------- | ---------------- | --------- | --------- | ------------- |
-| virtual_modbustcp | 0 | test_measurement | test_u | 1 | 3 |
+| **virtual_modbustcp** | **0** | **test_measurement** | **test_u** | **1** | **3** |
+ sdm630          |       0 | voltageL1              | V        | 3    |            4
+ sdm630          |       2 | voltageL2              | V        | 3    |            4
+ sdm630          |       4 | voltageL3              | V        | 3    |            4
+ sdm630          |       6 | currentL1              | A        | 3    |            4
+ sdm630          |       8 | currentL2              | A        | 3    |            4
+ sdm630          |      10 | currentL3              | A        | 3    |            4
+ sdm630          |      52 | activePower            | W        | 3    |            4
+
+Only records in bold can be found in preconfigured database, rest is example.
 
 
-
-**NOTE**
+### Side notes
 * registers table represents register mapping that should be available in datasheet of modbusTCP device
 * `host` can be saved as string or ip address
 * `description` is helper field (can be null) that figures later on in measurement tags in influxDB
