@@ -9,13 +9,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 def set_databank_words():
 	words = []
 	words.append(random.randrange(0, 10000))
-	words.append(random.randrange(220, 240))
-	words.append(random.randrange(0, 800))
 	print(words)
 
-	DataBank.set_words(0, [words[0]])   # power
-	DataBank.set_words(1, [words[1]])	# ac voltage
-	DataBank.set_words(2, [words[2]])	# dc voltage
+	DataBank.set_words(0, [words[0]]) 
 
 
 if __name__ == "__main__":
