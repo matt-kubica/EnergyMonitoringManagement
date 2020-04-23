@@ -4,145 +4,89 @@ import logging
 import psycopg2
 import sys
 import time
+import numpy as np
+import os
 
-from pyModbusTCP.client import ModbusClient as TCPModbusClient
-from pyModbusTCP import utils
+from utils import DataTypes, FunctionCodes
+from exceptions import UnknownDatatypeException, UnknownFunctioncodeException, ReadError
+
+from pymodbus.client.sync import ModbusTcpClient
 from influxdb import InfluxDBClient
-from configparser import ConfigParser
-from influx_updater_errors import ModbusClientException, FunctioncodeException, ReadError, UnknownDatatypeException, ParserException, InfluxError
 from psycopg2 import DatabaseError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-
-config_file                     = 'config.ini'
 log_file                        = 'info.log'
 
-# TODO: comments, tests - checkout all exceptions handling, add service
 
 class EnergyMeter():
 
-    def __init__(self, client_id, type, description, modbus_client):
-        self.__client_id = client_id
-        self.__type = type
-        self.__description = description
-        self.__modbus_client = modbus_client
-
-    def get_client_id(self):
-        return self.__client_id
-
-    def get_type(self):
-        return self.__type
-
-    def get_description(self):
-        return self.__description
-
-    def get_host(self):
-        return self.__modbus_client.get_host()
-
-    def get_port(self):
-        return self.__modbus_client.get_port()
-
-    def get_slaveaddress(self):
-        return self.__modbus_client.get_slaveaddress()
-
-    def get_register_data(self, address, datatype, functioncode):
-        return self.__modbus_client.get_register_data(address=address, datatype=datatype, functioncode=functioncode)
+    def __init__(self, type, description, modbus_client):
+        self.type = type
+        self.description = description
+        self.modbus_client = modbus_client
 
 
+class ModbusClient(ModbusTcpClient):
 
+    def __init__(self, host, port, slave_address):
+        self.host = host
+        self.port = port
+        self.slave_address = slave_address
+        ModbusTcpClient.__init__(self, host=host, port=port)
+        if not self.connect():
+            raise ConnectionError('Cannot connect to {0}:{1}'.format(host, port))
 
-class ModbusClient(TCPModbusClient):
-
-    def __init__(self, host, port, slaveaddress, timeout=1):
-        self.__host = host
-        self.__port = port
-        self.__slaveaddress = slaveaddress
-        TCPModbusClient.__init__(self, host=host, port=port, unit_id=slaveaddress, timeout=timeout, auto_open=True)
-
-    def get_host(self):
-        return self.__host
-
-    def get_port(self):
-        return self.__port
-
-    def get_slaveaddress(self):
-        return self.__slaveaddress
-
-    # raises UnknownDatatypeException, ReadError, FunctioncodeException
-    def get_register_data(self, address, datatype, functioncode):
-        if (datatype == 'float'):
-            return self.__read_float(address, functioncode)
-        elif (datatype == 'int'):
-            return self.__read_int(address, functioncode)
-        elif (datatype == 'long'):
-            return self.__read_long(address, functioncode)
+    def convert(self, registers, data_type):
+        if data_type == DataTypes.INT:
+            return registers[0]
+        elif data_type == DataTypes.FLOAT:
+            tmp = np.array(registers, np.int16)
+            tmp.dtype = np.float32
+            return tmp[0]
         else:
-            raise UnknownDatatypeException('Unknown datatype: ' + str(datatype))
+            tmp = np.array(registers, np.int16)
+            tmp.dtype = np.int32
+            return tmp[0]
 
-    def __read_float(self, address, functioncode):
-        if (functioncode == 3):
-            register = self.read_holding_registers(reg_addr=address, reg_nb=2)
-            if register:
-                return utils.decode_ieee(utils.word_list_to_long(register)[0])
-            else:
-                raise ReadError('Error during reading register: ' + str(address))
-        elif (functioncode == 4):
-            register = self.read_input_registers(reg_addr=address, reg_nb=2)
-            if register:
-                return  utils.decode_ieee(utils.word_list_to_long(register)[0])
-            else:
-                raise ReadError('Error during reading register: ' + str(address))
-        else:
-            raise FunctioncodeException('Undefined functioncode: ' + str(functioncode))
+    def get_value(self, register_address, function_code, data_type):
+        response = None
+        bytes_count = None
 
-    def __read_int(self, address, functioncode):
-        if (functioncode == 3):
-            register = self.read_holding_registers(reg_addr=address, reg_nb=1)
-            if register:
-                return register[0]
-            else:
-                raise ReadError('Error during reading register: ' + str(address))
-        elif (functioncode == 4):
-            register = self.read_input_registers(reg_addr=address, reg_nb=1)
-            if register:
-                return register[0]
-            else:
-                raise ReadError('Error during reading register: ' + str(address))
+        if data_type in (DataTypes.LONG, DataTypes.FLOAT):
+            bytes_count = 2
+        elif data_type in (DataTypes.INT, ):
+            bytes_count = 1
         else:
-            raise FunctioncodeException('Undefined functioncode: ' + str(functioncode))
+            raise UnknownDatatypeException('Unknown data type with id: {0}'.format(data_type))
 
-    def __read_long(self, address, functioncode):
-        if (functioncode == 3):
-            register = self.read_holding_registers(reg_addr=address, reg_nb=2)
-            if register:
-                return utils.word_list_to_long(register)[0]
-            else:
-                raise ReadError('Error during reading register: ' + str(address))
-        elif (functioncode == 4):
-            register = self.read_input_registers(reg_addr=address, reg_nb=2)
-            if register:
-                return utils.word_list_to_long(register)[0]
-            else:
-                raise ReadError('Error during reading register: ' + str(address))
+        if function_code == FunctionCodes.READ_INPUT_REGISTERS:
+            response = self.read_input_registers(address=register_address, count=bytes_count, unit=self.slave_address)
+        elif function_code == FunctionCodes.READ_HOLDING_REGISTERS:
+            response = self.read_input_registers(address=register_address, count=bytes_count, unit=self.slave_address)
         else:
-            raise FunctioncodeException('Undefined functioncode: ' + str(functioncode))
+            raise UnknownFunctioncodeException('Unknown function code: {0}'.format(function_code))
+
+        if response.isError():
+            raise ReadError('Cannot get value from register: {0}, slave_address: {1}'.format(register_address, self.slave_address))
+
+        return self.convert(response.registers, data_type)
+
+
 
 
 
 
 class InfluxUpdater():
 
-    def __init__(self, config_file, log_file):
-        self.__config_file = config_file
-        self.__log_file = log_file
+    def __init__(self):
         self.__logger_config()
         self.__scheduler_config()
 
 
     def __logger_config(self):
         self.__logger = logging.getLogger(__name__)
-        file_handler = logging.FileHandler(self.__log_file)
+        file_handler = logging.FileHandler(log_file)
         stream_handler = logging.StreamHandler(sys.stdout)
         formatter = logging.Formatter('%(asctime)s\t%(filename)s\t%(levelname)s\t%(message)s')
 
@@ -156,33 +100,35 @@ class InfluxUpdater():
 
     def __scheduler_config(self):
         self.__scheduler = BackgroundScheduler()
-        params = self.__get_config('scheduler')
+
+        params = {
+            'hour': os.environ.get("CRON_HOUR_TRIGGER", "*"),
+            'minute': os.environ.get("CRON_MINUTE_TRIGGER", "*/5"),
+            'second': os.environ.get("CRON_SECOND_TRIGGER", "0"),
+        }
+        print(params)
+
         self.__main_job = self.__scheduler.add_job(**params, func=self.__main_task, trigger='cron')
         self.__logger.debug('Configured scheduler...')
 
 
-    def __get_config(self, section):
-        parser = ConfigParser()
-        parser.read(self.__config_file)
-
-        db = {}
-        if parser.has_section(section):
-            params = parser.items(section)
-            for param in params:
-                db[param[0]] = param[1]
-        else:
-            raise ParserException
-        return db
-
 
     def __connect_influx(self):
         self.__influx_client = None
+
+        params = {
+            'host': os.environ.get("INFLUXDB_HOSTNAME"),
+            'port': os.environ.get("INFLUXDB_PORT"),
+            'database': os.environ.get("INFLUXDB_DB"),
+            'username': os.environ.get("INFLUXDB_ADMIN_USER"),
+            'password': os.environ.get("INFLUXDB_ADMIN_PASSWORD"),
+        }
+
         try:
-            params = self.__get_config('influx')
             self.__influx_client = InfluxDBClient(**params, timeout=10)
             self.__influx_client.request(url='ping', expected_response_code=204)
             self.__logger.debug('Successfully connected to influx...')
-        except (ParserException, ConnectionError, Exception) as err:
+        except (ConnectionError, Exception) as err:
             self.__logger.error(err)
 
     def __disconnect_influx(self):
@@ -191,7 +137,14 @@ class InfluxUpdater():
 
 
     def __connect_psql(self):
-        params = self.__get_config('psql')
+        params = {
+            'host': os.environ.get("POSTGRES_HOST"),
+            'port': os.environ.get("POSTGRES_PORT"),
+            'database': os.environ.get("POSTGRES_DB"),
+            'user': os.environ.get("POSTGRES_USER"),
+            'password': os.environ.get("POSTGRES_PASSWORD"),
+        }
+
         self.__psql_client = psycopg2.connect(**params)
         self.__logger.debug('Successfully connected to psql...')
 
@@ -204,18 +157,18 @@ class InfluxUpdater():
 
     def __get_energy_meters(self):
         self.__energy_meters = []
-        query = 'SELECT * FROM energy_meters;'
+        QUERY = 'SELECT * FROM energy_meters;'
 
         try:
             self.__connect_psql()
             cursor = self.__psql_client.cursor()
-            cursor.execute(query)
-        except (Exception, DatabaseError, ParserException) as err:
+            cursor.execute(QUERY)
+        except (Exception, DatabaseError) as err:
             self.__logger.error(err)
         else:
             for energy_meter_data in cursor.fetchall():
-                new_modbus_client = ModbusClient(host=energy_meter_data[1], port=energy_meter_data[2], slaveaddress=energy_meter_data[3])
-                new_energy_meter = EnergyMeter(client_id=energy_meter_data[0], type=energy_meter_data[4], description=energy_meter_data[5], modbus_client=new_modbus_client)
+                new_modbus_client = ModbusClient(host=energy_meter_data[0], port=energy_meter_data[1], slave_address=energy_meter_data[2])
+                new_energy_meter = EnergyMeter(type=energy_meter_data[3], description=energy_meter_data[4], modbus_client=new_modbus_client)
                 self.__energy_meters.append(new_energy_meter)
             cursor.close()
             self.__disconnect_psql()
@@ -229,15 +182,14 @@ class InfluxUpdater():
 
 
     def __get_registers(self, energy_meter_type):
-        query = 'SELECT registers.address, registers.measurement, registers.dataunit, registers.datatype, registers.functioncode FROM registers ' \
-                'WHERE registers.energy_meter_id = \'{0}\';'.format(energy_meter_type)
+        QUERY = 'SELECT * FROM registers WHERE type = \'{0}\';'.format(energy_meter_type)
 
         try:
             self.__connect_psql()
             cursor = self.__psql_client.cursor()
-            cursor.execute(query)
+            cursor.execute(QUERY)
             data = cursor.fetchall()
-        except (Exception, DatabaseError, ParserException) as err:
+        except (Exception, DatabaseError) as err:
             self.__logger.error(err)
         else:
             cursor.close()
@@ -250,41 +202,48 @@ class InfluxUpdater():
         self.__connect_influx()
 
         for energy_meter in self.__energy_meters:
-            registers = self.__get_registers(energy_meter.get_type())
+            registers = self.__get_registers(energy_meter.type)
             data_points_list = []
             for register in registers:
-                address = register[0]
-                measurement = register[1]
-                dataunit = register[2]
-                datatype = register[3]
-                functioncode = register[4]
+                address = register[1]
+                measurement = register[2]
+                dataunit = register[3]
+                datatype = register[4]
+                functioncode = register[5]
                 value = None
 
                 try:
-                    value = energy_meter.get_register_data(address=address, datatype=datatype, functioncode=functioncode)
+                    value = energy_meter.modbus_client.get_value(register_address=address, function_code=functioncode, data_type=datatype)
                     data_point = {
                         'measurement': str(measurement),
                         'tags': {
+                            'host': str(energy_meter.modbus_client.host),
+                            'port': str(energy_meter.modbus_client.port),
+                            'slave_address': str(energy_meter.modbus_client.slave_address),
+                            'description': str(energy_meter.description),
                             'dataunit': str(dataunit),
-                            'energy_meter': str(energy_meter.get_type()),
-                            'description': str(energy_meter.get_description()),
-                            'client_id': str(energy_meter.get_client_id())
                         },
                         'fields': {
                             'value': value
                         }
                     }
                     data_points_list.append(data_point)
-                except (FunctioncodeException, ReadError, UnknownDatatypeException) as err:
-                    self.__logger.error('Client: {0}, Host: {1}, Port: {2}, Slaveaddress: {3} => ModbusClientException: {4} ({5})'.format(
-                                                energy_meter.get_client_id(), energy_meter.get_host(), energy_meter.get_port(),
-                                                energy_meter.get_slaveaddress(), err, measurement))
-            self.__logger.debug('Got values from {0}'.format(energy_meter.get_host()))
+                except (UnknownFunctioncodeException, ReadError, UnknownDatatypeException) as err:
+                    self.__logger.error('Host: {0}, Port: {1}, Slaveaddress: {2} => ModbusClientException: {3} ({4})'.format(
+                        energy_meter.modbus_client.host,
+                        energy_meter.modbus_client.port,
+                        energy_meter.modbus_client.slave_address,
+                        err, measurement)
+                    )
 
             if (not self.__influx_client.write_points(data_points_list)):
                 self.__logger.error('Cannot write to influx...')
             data_points_list.clear()
-            self.__logger.debug('Updated influx with data from {0}'.format(energy_meter.get_host()))
+            self.__logger.debug('Updated influx with data from {0}:{1}:{2}'.format(
+                energy_meter.modbus_client.host,
+                energy_meter.modbus_client.port,
+                energy_meter.modbus_client.slave_address)
+            )
 
         self.__disconnect_influx()
 
@@ -310,5 +269,5 @@ class InfluxUpdater():
 
 
 if __name__ == '__main__':
-    influx_updater = InfluxUpdater(config_file=config_file, log_file=log_file)
+    influx_updater = InfluxUpdater()
     influx_updater.start()

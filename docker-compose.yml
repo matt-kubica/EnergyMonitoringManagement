@@ -1,0 +1,73 @@
+version: '3.3'
+
+services:
+  influx_updater:
+    container_name: influx_updater
+    build: ./influx_updater
+    command: python influx_updater.py
+    volumes:
+      - ./influx_updater:/app
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+      - influx
+      - grafana
+    networks:
+      - default_network
+
+  db:
+    container_name: default_db
+    image: postgres:12.0
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - ./.env.dev
+    networks:
+      - default_network
+
+  influx:
+    container_name: influx_db
+    image: influxdb:1.8.0
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdb_data:/var/lib/influxdb/data
+    env_file:
+      - ./.env.dev
+    networks:
+      - default_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    env_file:
+      - ./.env.dev
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - default_network
+
+
+  modbustcp_server:
+    container_name: virtual_modbustcp_server
+    build: ./virtual_modbustcp_server
+    command: python -u modbustcp_server.py
+    ports:
+      - 502:502
+    networks:
+      - default_network
+
+volumes:
+  postgres_data:
+  influxdb_data:
+  grafana_data:
+
+networks:
+  default_network:
+    driver: bridge
