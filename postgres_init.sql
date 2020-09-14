@@ -1,9 +1,9 @@
 CREATE TABLE energy_meters(
+	id int PRIMARY KEY,
 	host varchar(64) NOT NULL,
 	port int NOT NULL,
 	slave_address int NOT NULL,
 	type varchar(32) NOT NULL,
-	description varchar(64)
 );
 
 CREATE TABLE registers(
@@ -17,11 +17,11 @@ CREATE TABLE registers(
 
 
 INSERT INTO energy_meters VALUES(
+	0,
 	'virtual_modbustcp_server',
 	502,
 	0,
 	'virtual_modbustcp',
-	'test_energy_meter'
 );
 
 

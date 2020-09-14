@@ -21,9 +21,9 @@ log_file                        = 'info.log'
 
 class EnergyMeter():
 
-    def __init__(self, type, description, modbus_client):
+    def __init__(self, id, type, modbus_client):
+        self.id = id
         self.type = type
-        self.description = description
         self.modbus_client = modbus_client
 
 
@@ -58,7 +58,7 @@ class ModbusClient(ModbusTcpClient):
         elif data_type in (DataTypes.INT, ):
             bytes_count = 1
         else:
-            raise UnknownDatatypeException('Unknown data type with id: {0}'.format(data_type))
+            raise UnknownDatatypeException('Unknown data type: {0}'.format(data_type))
 
         if function_code == FunctionCodes.READ_INPUT_REGISTERS:
             response = self.read_input_registers(address=register_address, count=bytes_count, unit=self.slave_address)
@@ -167,8 +167,8 @@ class InfluxUpdater():
             self.__logger.error(err)
         else:
             for energy_meter_data in cursor.fetchall():
-                new_modbus_client = ModbusClient(host=energy_meter_data[0], port=energy_meter_data[1], slave_address=energy_meter_data[2])
-                new_energy_meter = EnergyMeter(type=energy_meter_data[3], description=energy_meter_data[4], modbus_client=new_modbus_client)
+                new_modbus_client = ModbusClient(host=energy_meter_data[1], port=energy_meter_data[2], slave_address=energy_meter_data[3])
+                new_energy_meter = EnergyMeter(id=energy_meter_data[0], type=energy_meter_data[4], modbus_client=new_modbus_client)
                 self.__energy_meters.append(new_energy_meter)
             cursor.close()
             self.__disconnect_psql()
@@ -217,10 +217,10 @@ class InfluxUpdater():
                     data_point = {
                         'measurement': str(measurement),
                         'tags': {
+                            'id': str(energy_meter.id)
                             'host': str(energy_meter.modbus_client.host),
                             'port': str(energy_meter.modbus_client.port),
                             'slave_address': str(energy_meter.modbus_client.slave_address),
-                            'description': str(energy_meter.description),
                             'dataunit': str(dataunit),
                         },
                         'fields': {
