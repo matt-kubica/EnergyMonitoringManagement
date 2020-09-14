@@ -218,9 +218,6 @@ class InfluxUpdater():
                         'measurement': str(measurement),
                         'tags': {
                             'id': str(energy_meter.id),
-                            'host': str(energy_meter.modbus_client.host),
-                            'port': str(energy_meter.modbus_client.port),
-                            'slave_address': str(energy_meter.modbus_client.slave_address),
                             'dataunit': str(dataunit),
                         },
                         'fields': {
