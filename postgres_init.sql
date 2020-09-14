@@ -18,18 +18,36 @@ CREATE TABLE registers(
 
 INSERT INTO energy_meters VALUES(
 	0,
-	'virtual_modbustcp_server',
+	'virtual_tlc10000_server',
 	502,
 	0,
-	'virtual_modbustcp'
+	'virtual-tlc10000'
 );
 
 
 INSERT INTO registers VALUES(
-	'virtual_modbustcp',
+	'virtual-tlc10000',
 	0,
-	'test_measurement',
-	'test_u',
-	1,
+	'activePower',
+	'kW',
+	3,
+	3
+);
+
+INSERT INTO registers VALUES(
+	'virtual-tlc10000',
+	0,
+	'activeEnergyProducedToday',
+	'kWh',
+	3,
+	3
+);
+
+INSERT INTO registers VALUES(
+	'virtual-tlc10000',
+	0,
+	'activeEnergyProduced',
+	'kWh',
+	3,
 	3
 );

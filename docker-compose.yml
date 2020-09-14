@@ -53,11 +53,19 @@ services:
     networks:
       - default_network
 
+  # modbustcp_server:
+  #   container_name: virtual_modbustcp_server
+  #   build: ./virtual_modbustcp_server
+  #   command: python -u modbustcp_server.py
+  #   ports:
+  #     - 502:502
+  #   networks:
+  #     - default_network
 
-  modbustcp_server:
-    container_name: virtual_modbustcp_server
-    build: ./virtual_modbustcp_server
-    command: python -u modbustcp_server.py
+  virtual_tlc10000:
+    container_name: virtual_tlc10000_server
+    build: ./virtual_tlc10000_server
+    command: python -u server.py
     ports:
       - 502:502
     networks:

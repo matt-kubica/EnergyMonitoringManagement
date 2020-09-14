@@ -63,7 +63,7 @@ class ModbusClient(ModbusTcpClient):
         if function_code == FunctionCodes.READ_INPUT_REGISTERS:
             response = self.read_input_registers(address=register_address, count=bytes_count, unit=self.slave_address)
         elif function_code == FunctionCodes.READ_HOLDING_REGISTERS:
-            response = self.read_input_registers(address=register_address, count=bytes_count, unit=self.slave_address)
+            response = self.read_holding_registers(address=register_address, count=bytes_count, unit=self.slave_address)
         else:
             raise UnknownFunctioncodeException('Unknown function code: {0}'.format(function_code))
 
