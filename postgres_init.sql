@@ -36,7 +36,7 @@ INSERT INTO registers VALUES(
 
 INSERT INTO registers VALUES(
 	'virtual-tlc10000',
-	0,
+	2,
 	'activeEnergyProducedToday',
 	'kWh',
 	3,
@@ -45,7 +45,7 @@ INSERT INTO registers VALUES(
 
 INSERT INTO registers VALUES(
 	'virtual-tlc10000',
-	0,
+	4,
 	'activeEnergyProduced',
 	'kWh',
 	3,

@@ -74,7 +74,6 @@ def get_active_energy_and_power():
             raise InverterConnectionError
     else:
         energy_total = recalculate_values(json.loads(api_request.text)['E-Total']['value'], json.loads(api_request.text)['E-Total']['unit'])
-        logger.debug(energy_total)
         return (power_AC, energy_today, energy_total)
 
 
@@ -101,19 +100,18 @@ def set_databank_words():
     DataBank.set_words(0, float_to_registers(active_power))
     DataBank.set_words(2, float_to_registers(active_energy_produced_today))
     DataBank.set_words(4, float_to_registers(active_energy_produced_total)) 
+    logger.debug("DataBank set!")
 
 
 
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("-H", "--host", type=str, default="0.0.0.0", help="host")
-    # parser.add_argument("-p", "--port", type=int, default=502, help="port")
-    # args = parser.parse_args()
     logger_config()
 
     modbus_server = ModbusServer(host="0.0.0.0", port=502, no_block=True)
     modbus_server.start()
     logger.debug('Server started!')
+
+    set_databank_words()
 
     scheduler = BackgroundScheduler()
     scheduler.add_job(set_databank_words, trigger="cron", minute="*")
