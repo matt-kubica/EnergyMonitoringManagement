@@ -1,5 +1,6 @@
 
 import sys
+import os
 import time
 import logging
 import requests
@@ -10,11 +11,9 @@ from pyModbusTCP.server import ModbusServer, DataBank
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-INVERTER_HOST                     = '178.218.234.100'
-INVERTER_PORT                     = '2138'
-INVERTER_URL                      = 'http://' + INVERTER_HOST + ':' + INVERTER_PORT + '/home.cgi?sid=0'
+INVERTER_URL                      = 'http://' + os.environ.get("VIRTUAL_TLC10000_HOST") + ':' + os.environ.get("VIRTUAL_TLC10000_PORT") + '/home.cgi?sid=0'
 
-API_KEY                           = '9d10bedba49340a28aa0a8664d2ee7f0'
+API_KEY                           = os.environ.get("VIRTUAL_TLC10000_API_KEY")
 API_URL                           = 'https://www.zevercloud.com/api/v1/getPlantOverview'
 
 logger                            = None
@@ -96,6 +95,10 @@ def set_databank_words():
     except InverterConnectionError:
         pass
 
+
+    logger.debug(float_to_registers(active_power))
+    logger.debug(float_to_registers(active_energy_produced_today))
+    logger.debug(float_to_registers(active_energy_produced_total))
 
     DataBank.set_words(0, float_to_registers(active_power))
     DataBank.set_words(2, float_to_registers(active_energy_produced_today))

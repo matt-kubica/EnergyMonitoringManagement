@@ -68,6 +68,8 @@ services:
     command: python -u server.py
     ports:
       - 502:502
+    env_file:
+      - ./.env.dev
     networks:
       - default_network
 
