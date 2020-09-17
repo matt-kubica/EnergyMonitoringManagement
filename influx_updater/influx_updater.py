@@ -41,11 +41,11 @@ class ModbusClient(ModbusTcpClient):
         if data_type == DataTypes.INT:
             return registers[0]
         elif data_type == DataTypes.FLOAT:
-            tmp = np.array(registers, np.int16)
+            tmp = np.array(registers, np.uint16)
             tmp.dtype = np.float32
             return tmp[0]
         else:
-            tmp = np.array(registers, np.int16)
+            tmp = np.array(registers, np.uint16)
             tmp.dtype = np.int32
             return tmp[0]
 
@@ -102,9 +102,9 @@ class InfluxUpdater():
         self.__scheduler = BackgroundScheduler()
 
         params = {
-            'hour': os.environ.get("CRON_HOUR_TRIGGER", "*"),
-            'minute': os.environ.get("CRON_MINUTE_TRIGGER", "*/5"),
-            'second': os.environ.get("CRON_SECOND_TRIGGER", "0"),
+            'hour': os.environ.get("INFLUX_UPDATER_CRON_HOUR_TRIGGER", "*"),
+            'minute': os.environ.get("INFLUX_UPDATER_CRON_MINUTE_TRIGGER", "*/5"),
+            'second': os.environ.get("INFLUX_UPDATER_CRON_SECOND_TRIGGER", "0"),
         }
         print(params)
 

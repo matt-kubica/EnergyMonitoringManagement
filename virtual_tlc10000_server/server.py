@@ -78,7 +78,7 @@ def get_active_energy_and_power():
 
 def float_to_registers(number):
     tmp = np.array([number], np.float32)
-    tmp.dtype = np.int16
+    tmp.dtype = np.uint16
     return tmp
 
 
@@ -96,13 +96,14 @@ def set_databank_words():
         pass
 
 
-    logger.debug(float_to_registers(active_power))
-    logger.debug(float_to_registers(active_energy_produced_today))
-    logger.debug(float_to_registers(active_energy_produced_total))
+    logger.debug('activePower = {0} = {1}'.format(active_power, float_to_registers(active_power)))
+    logger.debug('activeEnergyProducedToday = {0} = {1}'.format(active_energy_produced_today, float_to_registers(active_energy_produced_today)))
+    logger.debug('activeEnergyProducedTotal = {0} = {1}'.format(active_energy_produced_total, float_to_registers(active_energy_produced_total)))
 
     DataBank.set_words(0, float_to_registers(active_power))
     DataBank.set_words(2, float_to_registers(active_energy_produced_today))
-    DataBank.set_words(4, float_to_registers(active_energy_produced_total)) 
+    DataBank.set_words(4, float_to_registers(active_energy_produced_total))
+
     logger.debug("DataBank set!")
 
 
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     set_databank_words()
 
     scheduler = BackgroundScheduler()
-    scheduler.add_job(set_databank_words, trigger="cron", minute="*")
+    scheduler.add_job(set_databank_words, trigger="cron", minute="*", second="10")
     scheduler.start()
 
     while True:
