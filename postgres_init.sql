@@ -15,6 +15,10 @@ CREATE TABLE registers(
 	function_code int CHECK (function_code >= 3 AND function_code <= 4)
 );
 
+COPY registers
+FROM '/data/registers.csv' 
+DELIMITER ',' 
+CSV HEADER;
 
 -- INSERT INTO energy_meters VALUES(
 -- 	0,

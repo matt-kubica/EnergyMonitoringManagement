@@ -23,6 +23,7 @@ services:
       - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./registers.csv:/data/registers.csv
       - ./postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - ./.env.dev
