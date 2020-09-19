@@ -20,38 +20,22 @@ FROM '/data/registers.csv'
 DELIMITER ',' 
 CSV HEADER;
 
--- INSERT INTO energy_meters VALUES(
--- 	0,
--- 	'virtual_tlc10000_server',
--- 	502,
--- 	0,
--- 	'virtual-tlc10000'
--- );
+
+INSERT INTO energy_meters VALUES(
+	0,
+	'virtual_tlc10000_server',
+	502,
+	0,
+	'virtual-tlc10000'
+);
+
+INSERT INTO energy_meters VALUES(
+	1,
+	'192.168.1.6',
+	502,
+	1,
+	'sdm630'
+);
 
 
--- INSERT INTO registers VALUES(
--- 	'virtual-tlc10000',
--- 	0,
--- 	'activePower',
--- 	'kW',
--- 	3,
--- 	4
--- );
 
--- INSERT INTO registers VALUES(
--- 	'virtual-tlc10000',
--- 	2,
--- 	'activeEnergyProducedToday',
--- 	'kWh',
--- 	3,
--- 	4
--- );
-
--- INSERT INTO registers VALUES(
--- 	'virtual-tlc10000',
--- 	4,
--- 	'activeEnergyProduced',
--- 	'kWh',
--- 	3,
--- 	4
--- );
