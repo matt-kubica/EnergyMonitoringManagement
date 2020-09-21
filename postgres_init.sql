@@ -18,27 +18,27 @@ CREATE TABLE registers(
 	byte_order int CHECK (byte_order >= 1 AND byte_order <= 2)
 );
 
-COPY registers
-FROM '/data/registers.csv' 
-DELIMITER ',' 
-CSV HEADER;
 
 
-INSERT INTO energy_meters VALUES(
+
+INSERT INTO registers VALUES(
+	'virtual_modbustcp_server',
 	0,
-	'virtual_tlc10000_server',
-	502,
-	0,
-	'virtual-tlc10000',
-	'inverter'
+	'test_measurement',
+	't-unit',
+	3,
+	4,
+	2,
+	2
 );
 
+
 INSERT INTO energy_meters VALUES(
-	1,
-	'192.168.1.6',
+	0,
+	'virtual_modbustcp_server',
 	502,
-	1,
-	'sdm630',
+	0,
+	'virtual_modbustcp_server',
 	'test_energy_meter'
 );
 

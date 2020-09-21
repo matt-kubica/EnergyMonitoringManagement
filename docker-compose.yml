@@ -13,7 +13,7 @@ services:
       - db
       - influx
       - grafana
-      - virtual_tlc10000
+      - virtual_modbustcp
     networks:
       - default_network 
 
@@ -55,10 +55,10 @@ services:
     networks:
       - default_network
 
-  virtual_tlc10000:
-    container_name: virtual_tlc10000_server
-    build: ./virtual_tlc10000_server
-    command: python -u virtual_tlc10000_server.py
+  virtual_modbustcp:
+    container_name: virtual_modbustcp_server
+    build: ./virtual_modbustcp_server
+    command: python -u test.py
     ports:
       - 502:502
     env_file:
