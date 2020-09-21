@@ -25,7 +25,7 @@ CSV HEADER;
 
 
 INSERT INTO energy_meters VALUES(
-	0,
+	4,
 	'virtual_tlc10000_server',
 	502,
 	0,
@@ -34,7 +34,7 @@ INSERT INTO energy_meters VALUES(
 );
 
 INSERT INTO energy_meters VALUES(
-	1,
+	5,
 	'192.168.1.6',
 	502,
 	1,
@@ -42,13 +42,6 @@ INSERT INTO energy_meters VALUES(
 	'test_energy_meter'
 );
 
--- INSERT INTO energy_meters VALUES(
--- 	0,
--- 	'virtual_modbustcp_server',
--- 	502,
--- 	1,
--- 	'test'
--- );
 
 
 
