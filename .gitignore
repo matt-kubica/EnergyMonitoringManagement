@@ -145,3 +145,4 @@ dmypy.json
 cython_debug/
 
 docker-compose.override.yml
+postgres_init.override.sql
