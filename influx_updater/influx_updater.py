@@ -18,8 +18,6 @@ from psycopg2 import DatabaseError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-log_file                        = 'info.log'
-
 
 class EnergyMeter():
 
@@ -77,14 +75,10 @@ class InfluxUpdater():
 
     def __logger_config(self):
         self.__logger = logging.getLogger(__name__)
-        file_handler = logging.FileHandler(log_file)
         stream_handler = logging.StreamHandler(sys.stdout)
         formatter = logging.Formatter('%(asctime)s\t%(filename)s\t%(levelname)s\t%(message)s')
-
-        file_handler.setFormatter(formatter)
         stream_handler.setFormatter(formatter)
 
-        self.__logger.addHandler(file_handler)
         self.__logger.addHandler(stream_handler)
         self.__logger.setLevel(logging.DEBUG)
 
@@ -97,7 +91,7 @@ class InfluxUpdater():
             'minute': os.environ.get("INFLUX_UPDATER_CRON_MINUTE_TRIGGER", "*/5"),
             'second': os.environ.get("INFLUX_UPDATER_CRON_SECOND_TRIGGER", "0"),
         }
-        print(params)
+
 
         self.__main_job = self.__scheduler.add_job(**params, func=self.__main_task, trigger='cron')
         self.__logger.debug('Configured scheduler...')
@@ -215,7 +209,6 @@ class InfluxUpdater():
                             'value': value
                         }
                     }
-                    print(data_point)
                     data_points_list.append(data_point)
                 except (UnknownFunctioncodeException, ReadError, UnknownDatatypeException) as err:
                     self.__logger.error('Host: {0}, Port: {1}, Slaveaddress: {2} => ModbusClientException: {3} ({4})'.format(
