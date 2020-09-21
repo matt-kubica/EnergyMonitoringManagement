@@ -13,9 +13,9 @@ services:
       - db
       - influx
       - grafana
-      -virtual_tlc10000
+      - virtual_tlc10000
     networks:
-      - default_network
+      - default_network 
 
   db:
     container_name: default_db
@@ -44,7 +44,7 @@ services:
       - default_network
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:5.4.3
     container_name: grafana
     ports:
       - 3000:3000
