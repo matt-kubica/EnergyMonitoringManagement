@@ -56,3 +56,4 @@ le03mwct,296,reactiveEnergyProduced,kVarh,3,3
 virtual-tlc10000,0,activePower,kW,3,3
 virtual-tlc10000,2,activeEnergyProducedToday,kWh,3,3
 virtual-tlc10000,4,acviteEnergyProduced,kWh,3,3
+test,0,test-measurement,t,3,4

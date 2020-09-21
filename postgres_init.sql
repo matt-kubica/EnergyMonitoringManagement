@@ -21,20 +21,28 @@ DELIMITER ','
 CSV HEADER;
 
 
-INSERT INTO energy_meters VALUES(
-	0,
-	'virtual_tlc10000_server',
-	502,
-	0,
-	'virtual-tlc10000'
-);
+-- INSERT INTO energy_meters VALUES(
+-- 	0,
+-- 	'virtual_tlc10000_server',
+-- 	502,
+-- 	0,
+-- 	'virtual-tlc10000'
+-- );
+
+-- INSERT INTO energy_meters VALUES(
+-- 	1,
+-- 	'192.168.1.6',
+-- 	502,
+-- 	1,
+-- 	'sdm630'
+-- );
 
 INSERT INTO energy_meters VALUES(
-	1,
-	'192.168.1.6',
+	0,
+	'virtual_modbustcp_server',
 	502,
 	1,
-	'sdm630'
+	'test'
 );
 
 
