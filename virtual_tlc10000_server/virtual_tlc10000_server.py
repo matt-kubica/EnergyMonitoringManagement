@@ -15,7 +15,7 @@ formatter = logging.Formatter('%(asctime)s\t%(filename)s\t%(levelname)s\t%(messa
 stream_handler.setFormatter(formatter)
 
 logger.addHandler(stream_handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class VirtualTLC10000(VirtualModbusTCPServer):
@@ -26,16 +26,22 @@ class VirtualTLC10000(VirtualModbusTCPServer):
         ADDRESS = 0x00
 
         builder = BinaryPayloadBuilder(byteorder=Endian.Big, wordorder=Endian.Big)
-        builder.add_32bit_float(get_power())
-        builder.add_32bit_float(get_energy_today())
-        builder.add_32bit_float(get_energy_total())
+        power = get_power()
+        energy_today = get_energy_today()
+        energy_total = get_energy_total()
+
+        logger.debug('Power = {0}, EnergyToday = {1}, EnergyTotal = {2}'. format(power, energy_today, energy_total))
+
+        builder.add_32bit_float(power)
+        builder.add_32bit_float(energy_today)
+        builder.add_32bit_float(energy_total)
 
         self.store.setValues(FUNCTION_CODE, ADDRESS, builder.to_registers())
-        logger.debug('Data store updated')
+        logger.info('Data store updated')
 
 
 if __name__ == '__main__':
     port = int(os.environ.get("VIRTUAL_TLC10000_SERVER_PORT"))
     v = VirtualTLC10000(port)
-    logger.debug('Server started on port {0}'.format(port))
+    logger.info('Server started on port {0}'.format(port))
     v.start()

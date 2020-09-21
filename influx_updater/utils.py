@@ -15,3 +15,8 @@ class DataTypes(CustomEnum):
 class FunctionCodes(CustomEnum):
     READ_HOLDING_REGISTERS = 3
     READ_INPUT_REGISTERS = 4
+
+
+class EndianOrder(CustomEnum):
+	LITTLE = 1
+	BIG = 2

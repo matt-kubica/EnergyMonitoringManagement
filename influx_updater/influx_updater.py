@@ -6,7 +6,7 @@ import sys
 import time
 import os
 
-from utils import DataTypes, FunctionCodes
+from utils import DataTypes, FunctionCodes, EndianOrder
 from exceptions import UnknownDatatypeException, UnknownFunctioncodeException, ReadError
 
 from pymodbus.client.sync import ModbusTcpClient
@@ -21,9 +21,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 class EnergyMeter():
 
-    def __init__(self, id, type, modbus_client):
+    def __init__(self, id, type, description, modbus_client):
         self.id = id
         self.type = type
+        self.description = description
         self.modbus_client = modbus_client
 
 
@@ -38,7 +39,7 @@ class ModbusClient(ModbusTcpClient):
             raise ConnectionError('Cannot connect to {0}:{1}'.format(host, port))
 
 
-    def get_value(self, register_address, function_code, data_type):
+    def get_value(self, register_address, function_code, data_type, word_order, byte_order):
         response = None
         count = None
 
@@ -59,8 +60,18 @@ class ModbusClient(ModbusTcpClient):
         if response.isError():
             raise ReadError('Cannot get value from register: {0}, slave_address: {1}'.format(register_address, self.slave_address))
 
-        decoder = BinaryPayloadDecoder.fromRegisters(response.registers, byteorder=Endian.Big, wordorder=Endian.Big)
-        return decoder.decode_32bit_float()
+        
+        decoder = BinaryPayloadDecoder.fromRegisters(response.registers, 
+            byteorder=(Endian.Big if byte_order == EndianOrder.BIG else Endian.Little), 
+            wordorder=(Endian.Big if word_order == EndianOrder.BIG else Endian.Little))
+
+        if data_type == DataTypes.FLOAT:
+            return decoder.decode_32bit_float()
+        elif data_type == DataTypes.LONG:
+            return decoder.decode_32bit_int()
+        elif data_type == DataTypes.INT:
+            return decoder.decode_16bit_int()
+        
 
 
 
@@ -80,7 +91,7 @@ class InfluxUpdater():
         stream_handler.setFormatter(formatter)
 
         self.__logger.addHandler(stream_handler)
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(logging.INFO)
 
 
     def __scheduler_config(self):
@@ -153,15 +164,15 @@ class InfluxUpdater():
         else:
             for energy_meter_data in cursor.fetchall():
                 new_modbus_client = ModbusClient(host=energy_meter_data[1], port=energy_meter_data[2], slave_address=energy_meter_data[3])
-                new_energy_meter = EnergyMeter(id=energy_meter_data[0], type=energy_meter_data[4], modbus_client=new_modbus_client)
+                new_energy_meter = EnergyMeter(id=energy_meter_data[0], type=energy_meter_data[4], description=energy_meter_data[5], modbus_client=new_modbus_client)
                 self.__energy_meters.append(new_energy_meter)
             cursor.close()
             self.__disconnect_psql()
 
         if(not self.__energy_meters):
-            self.__logger.debug('Energy meter list is empty...')
+            self.__logger.info('Energy meter list is empty...')
         else:
-            self.__logger.debug('Updated energy meter list...')
+            self.__logger.info('Updated energy meter list...')
 
 
 
@@ -195,18 +206,21 @@ class InfluxUpdater():
                 dataunit = register[3]
                 datatype = register[4]
                 functioncode = register[5]
+                wordorder = register[6]
+                byteorder = register[7]
                 value = None
 
                 try:
-                    value = energy_meter.modbus_client.get_value(register_address=address, function_code=functioncode, data_type=datatype)
+                    value = energy_meter.modbus_client.get_value(register_address=address, function_code=functioncode, data_type=datatype, word_order=wordorder, byte_order=byteorder)
                     data_point = {
                         'measurement': str(measurement),
                         'tags': {
                             'id': str(energy_meter.id),
+                            'description': str(energy_meter.description),
                             'dataunit': str(dataunit),
                         },
                         'fields': {
-                            'value': value
+                            'value': float(value)
                         }
                     }
                     data_points_list.append(data_point)
@@ -218,10 +232,10 @@ class InfluxUpdater():
                         err, measurement)
                     )
 
-            if (not self.__influx_client.write_points(data_points_list)):
+            if (not self.__influx_client.write_points(data_points_list, time_precision='s')):
                 self.__logger.error('Cannot write to influx...')
             data_points_list.clear()
-            self.__logger.debug('Updated influx with data from {0}:{1}:{2}'.format(
+            self.__logger.info('Updated influx with data from {0}:{1}:{2}'.format(
                 energy_meter.modbus_client.host,
                 energy_meter.modbus_client.port,
                 energy_meter.modbus_client.slave_address)
