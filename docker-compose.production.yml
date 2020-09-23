@@ -1,0 +1,38 @@
+version: '3.3'
+
+services:
+  influx_updater:
+    env_file:
+      - ./production/.env
+
+  db:
+    ports:
+      - 5432:5432
+    env_file:
+      - ./production/.env
+    volumes:
+      - ./production/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
+  influx:
+    ports:
+      - 8086:8086
+    env_file:
+      - ./production/.env
+
+  grafana:
+    ports:
+      - 3000:3000
+    env_file:
+      - ./production/.env
+
+  virtual_modbustcp:
+    container_name: virtual_tlc10000_server
+    build: ./virtual_tlc10000_server
+    command: python -u virtual_tlc10000_server.py
+    ports:
+      - 502:502
+    env_file:
+      - ./production/.env
+    networks:
+      - default_network

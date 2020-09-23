@@ -143,6 +143,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-docker-compose.override.yml
-postgres_init.override.sql
