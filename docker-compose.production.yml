@@ -11,6 +11,7 @@ services:
     env_file:
       - ./production/.env
     volumes:
+      - ./production/registers.csv:/data/registers.csv
       - ./production/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
 
 
