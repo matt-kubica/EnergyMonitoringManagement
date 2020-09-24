@@ -27,6 +27,9 @@ class EnergyMeter():
         self.description = description
         self.modbus_client = modbus_client
 
+    def __str__(self):
+        return '{0} -> {1}'.format(self.description, self.modbus_client.__str__())
+
 
 class ModbusClient(ModbusTcpClient):
 
@@ -37,6 +40,9 @@ class ModbusClient(ModbusTcpClient):
         ModbusTcpClient.__init__(self, host=host, port=port)
         if not self.connect():
             raise ConnectionError('Cannot connect to {0}:{1}'.format(host, port))
+
+    def __str__(self):
+        return '{0}:{1}:{2}'.format(self.host, self.port, self.slave_address)
 
 
     def get_value(self, register_address, function_code, data_type, word_order, byte_order):
@@ -162,17 +168,23 @@ class InfluxUpdater():
         except (Exception, DatabaseError) as err:
             self.__logger.error(err)
         else:
+            self.__logger.info('Energy meter list:')
             for energy_meter_data in cursor.fetchall():
-                new_modbus_client = ModbusClient(host=energy_meter_data[1], port=energy_meter_data[2], slave_address=energy_meter_data[3])
-                new_energy_meter = EnergyMeter(id=energy_meter_data[0], type=energy_meter_data[4], description=energy_meter_data[5], modbus_client=new_modbus_client)
-                self.__energy_meters.append(new_energy_meter)
+
+                try:
+                    new_modbus_client = ModbusClient(host=energy_meter_data[1], port=energy_meter_data[2], slave_address=energy_meter_data[3])
+                    new_energy_meter = EnergyMeter(id=energy_meter_data[0], type=energy_meter_data[4], description=energy_meter_data[5], modbus_client=new_modbus_client)
+                    self.__energy_meters.append(new_energy_meter)
+                except ConnectionError as err:
+                    self.__logger.warning('{0}, skipping...'.format(err))
+                    continue
+
+                
             cursor.close()
             self.__disconnect_psql()
 
         if(not self.__energy_meters):
             self.__logger.info('Energy meter list is empty...')
-        else:
-            self.__logger.info('Updated energy meter list...')
 
 
 
@@ -196,6 +208,8 @@ class InfluxUpdater():
     def __update_influx(self):
         self.__get_energy_meters()
         self.__connect_influx()
+
+        
 
         for energy_meter in self.__energy_meters:
             registers = self.__get_registers(energy_meter.type)
@@ -254,6 +268,11 @@ class InfluxUpdater():
     def start(self):
         self.__scheduler.start()
         self.__logger.info('Program started...')
+
+        time.sleep(15)
+        self.__main_task()
+        
+
         while(True):
             time.sleep(1)
 
