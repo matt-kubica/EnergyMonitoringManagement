@@ -161,12 +161,12 @@ class InfluxUpdater():
         for energy_meter in new_energy_meters:
             self.energy_meters.append(energy_meter)
             self.scheduler.add_job(**cron_params, id=str(energy_meter.id), func=self.update_influx, args=[energy_meter], trigger='cron')
-            self.logger.info('Added new energy meter: {0}'.format(energy_meter.id))
+            self.logger.info('Added new energy meter: ({0})'.format(energy_meter))
 
         for energy_meter in removed_energy_meters:
             self.energy_meters.remove(energy_meter)
             self.scheduler.remove_job(str(energy_meter.id))
-            self.logger.info('Removed energy meter: {0}'.format(energy_meter.id))
+            self.logger.info('Removed energy meter: ({0})'.format(energy_meter))
 
 
 
