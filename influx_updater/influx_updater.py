@@ -40,9 +40,9 @@ class InfluxUpdater():
         self.scheduler = BackgroundScheduler()
 
         cron_params = {
-            'hour': os.environ.get("SCHEDULER_CRON_HOUR_TRIGGER", "*"),
-            'minute': os.environ.get("SCHEDULER_CRON_MINUTE_TRIGGER", "*"),
-            'second': os.environ.get("SCHEDULER_CRON_SECOND_TRIGGER", "50"),
+            'hour': os.environ.get("SCHEDULER_CRON_HOUR_TRIGGER"),
+            'minute': os.environ.get("SCHEDULER_CRON_MINUTE_TRIGGER"),
+            'second': os.environ.get("SCHEDULER_CRON_SECOND_TRIGGER"),
         }
 
 
