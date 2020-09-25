@@ -4,7 +4,7 @@ services:
   influx_updater:
     container_name: influx_updater
     build: ./influx_updater
-    command: python influx_updater.py
+    command: sh -c "dockerize -wait tcp://db:5432 python influx_updater.py"
     volumes:
       - ./influx_updater:/app
     env_file:
