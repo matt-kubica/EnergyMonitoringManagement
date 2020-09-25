@@ -68,7 +68,7 @@ def request_api():
 
 def get_power():
     request_body = request_inverter()
-    if not requests_body:
+    if not request_body:
         return 0.0
     else:
         parameter_list = list(request_body.text.split('\n'))
@@ -77,7 +77,7 @@ def get_power():
 
 def get_energy_today():
     request_body = request_inverter()
-    if not requests_body:
+    if not request_body:
         return 0.0
     else:
         parameter_list = list(request_body.text.split('\n'))
@@ -86,7 +86,7 @@ def get_energy_today():
 
 def get_energy_total():
     request_body = request_api()
-    if not requests_body:
+    if not request_body:
         return 0.0
     else:
         return recalculate_values(json.loads(request_body.text)['E-Total']['value'], json.loads(request_body.text)['E-Total']['unit'])
