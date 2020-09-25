@@ -58,7 +58,7 @@ services:
   virtual_modbustcp:
     container_name: virtual_modbustcp_server
     build: ./virtual_modbustcp_server
-    command: python -u test.py
+    command: python test.py
     ports:
       - 502:502
     env_file:
