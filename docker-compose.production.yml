@@ -26,6 +26,8 @@ services:
       - 3000:3000
     env_file:
       - ./production/.env
+    volumes:
+      - ./production/grafana:/etc/grafana/provisioning
 
   virtual_modbustcp:
     container_name: virtual_tlc10000_server

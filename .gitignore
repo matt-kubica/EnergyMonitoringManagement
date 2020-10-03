@@ -147,3 +147,4 @@ cython_debug/
 !*.secret
 production/postgres_init.sql
 production/registers.csv
+production/grafana/datasources/datasource.yaml
