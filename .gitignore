@@ -112,7 +112,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -145,6 +144,9 @@ dmypy.json
 cython_debug/
 .gitsecret/keys/random_seed
 !*.secret
+
+
 production/postgres_init.sql
 production/registers.csv
 production/grafana/datasources/datasource.yaml
+production/.env
