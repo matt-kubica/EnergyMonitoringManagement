@@ -52,6 +52,7 @@ services:
       - ./.env.dev
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana:/etc/grafana/provisioning
     networks:
       - default_network
 
