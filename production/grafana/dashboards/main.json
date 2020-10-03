@@ -74,7 +74,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT abs(last(\"value\") / 1000) FROM \"activePower\" WHERE (\"device\" = 'main_energy_meter') AND value < 0 AND time > now() - 5m\n",
+          "query": "SELECT abs(last(\"value\") / 1000) FROM \"activePower\" WHERE (\"description\" = 'main_energy_meter') AND value < 0 AND time > now() - 5m\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -94,7 +94,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -163,7 +163,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT last(\"value\") / 1000 FROM \"activePower\" WHERE (\"device\" = 'main_energy_meter') AND value > 0 AND time > now() - 5m",
+          "query": "SELECT last(\"value\") / 1000 FROM \"activePower\" WHERE (\"description\" = 'main_energy_meter') AND value > 0 AND time > now() - 5m",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -183,7 +183,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -252,7 +252,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT last(\"value\") FROM \"activePower\" WHERE (\"device\" = 'inverter') AND time > now() - 5m",
+          "query": "SELECT last(\"value\") FROM \"activePower\" WHERE (\"description\" = 'inverter') AND time > now() - 5m",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -272,7 +272,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "inverter"
             }
@@ -341,7 +341,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT last(\"value\") / 1000 FROM \"activePower\" WHERE (\"device\" = 'house_energy_meter') AND time > now() - 5m",
+          "query": "SELECT last(\"value\") / 1000 FROM \"activePower\" WHERE (\"description\" = 'house_energy_meter') AND time > now() - 5m",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -361,7 +361,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "house_energy_meter"
             }
@@ -430,7 +430,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT last(\"value\") FROM \"activePower\" WHERE (\"device\" = 'hp_energy_meter') AND time > now() - 5m",
+          "query": "SELECT last(\"value\") FROM \"activePower\" WHERE (\"description\" = 'hp_energy_meter') AND time > now() - 5m",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -450,7 +450,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "hp_energy_meter"
             }
@@ -568,7 +568,7 @@
           "measurement": "activeEnergyConsumed",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT non_negative_difference(max(\"value\")) FROM \"activeEnergyConsumed\" WHERE (\"device\" = 'house_energy_meter') AND $timeFilter GROUP BY time(1h) fill(linear)",
+          "query": "SELECT non_negative_difference(max(\"value\")) FROM \"activeEnergyConsumed\" WHERE (\"description\" = 'house_energy_meter') AND $timeFilter GROUP BY time(1h) fill(linear)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -592,7 +592,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "house_energy_meter"
             }
@@ -640,7 +640,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -687,7 +687,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "hp_energy_meter"
             }
@@ -735,7 +735,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -782,7 +782,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "inverter"
             }
@@ -940,7 +940,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "house_energy_meter"
             }
@@ -988,7 +988,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -1036,7 +1036,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "hp_energy_meter"
             }
@@ -1084,7 +1084,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -1132,7 +1132,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "inverter"
             }
@@ -1294,7 +1294,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "house_energy_meter"
             }
@@ -1342,7 +1342,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -1390,7 +1390,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "hp_energy_meter"
             }
@@ -1416,7 +1416,7 @@
           "measurement": "activeEnergyProduced",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT non_negative_difference(max(\"value\")) FROM \"activeEnergyProduced\" WHERE (\"device\" = 'main_energy_meter') AND $timeFilter GROUP BY time(1d) fill(null)",
+          "query": "SELECT non_negative_difference(max(\"value\")) FROM \"activeEnergyProduced\" WHERE (\"description\" = 'main_energy_meter') AND $timeFilter GROUP BY time(1d) fill(null)",
           "rawQuery": false,
           "refId": "D",
           "resultFormat": "time_series",
@@ -1440,7 +1440,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -1466,7 +1466,7 @@
           "measurement": "activeEnergyProducedToday",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(non_negative_difference(\"value\")) FROM \"activeEnergyProducedToday\" WHERE (\"device\" = 'inverter') AND $timeFilter GROUP BY time(1d) fill(null)",
+          "query": "SELECT sum(non_negative_difference(\"value\")) FROM \"activeEnergyProducedToday\" WHERE (\"description\" = 'inverter') AND $timeFilter GROUP BY time(1d) fill(null)",
           "rawQuery": false,
           "refId": "E",
           "resultFormat": "time_series",
@@ -1486,7 +1486,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "inverter"
             }
@@ -1645,7 +1645,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "house_energy_meter"
             }
@@ -1693,7 +1693,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -1741,7 +1741,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "hp_energy_meter"
             }
@@ -1767,7 +1767,7 @@
           "measurement": "activeEnergyProduced",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT non_negative_difference(max(\"value\")) FROM \"activeEnergyProduced\" WHERE (\"device\" = 'main_energy_meter') AND $timeFilter GROUP BY time(1d) fill(null)",
+          "query": "SELECT non_negative_difference(max(\"value\")) FROM \"activeEnergyProduced\" WHERE (\"description\" = 'main_energy_meter') AND $timeFilter GROUP BY time(1d) fill(null)",
           "rawQuery": false,
           "refId": "D",
           "resultFormat": "time_series",
@@ -1791,7 +1791,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -1817,7 +1817,7 @@
           "measurement": "activeEnergyProducedToday",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(non_negative_difference(\"value\")) FROM \"activeEnergyProducedToday\" WHERE (\"device\" = 'inverter') AND $timeFilter GROUP BY time(1d) fill(null)",
+          "query": "SELECT sum(non_negative_difference(\"value\")) FROM \"activeEnergyProducedToday\" WHERE (\"description\" = 'inverter') AND $timeFilter GROUP BY time(1d) fill(null)",
           "rawQuery": false,
           "refId": "E",
           "resultFormat": "time_series",
@@ -1837,7 +1837,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "inverter"
             }
@@ -1964,7 +1964,7 @@
           "measurement": "activeEnergyProduced",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT last(\"value\") / 1000 FROM \"activePower\" WHERE (\"device\" = 'house_energy_meter') AND $timeFilter",
+          "query": "SELECT last(\"value\") / 1000 FROM \"activePower\" WHERE (\"description\" = 'house_energy_meter') AND $timeFilter",
           "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
@@ -1984,7 +1984,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "inverter"
             }
@@ -2113,7 +2113,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "main_energy_meter"
             }
@@ -2139,7 +2139,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"value\") FROM \"activePower\" WHERE (\"device\" = 'inverter') AND $timeFilter GROUP BY time(5m) fill(null)",
+          "query": "SELECT mean(\"value\") FROM \"activePower\" WHERE (\"description\" = 'inverter') AND $timeFilter GROUP BY time(5m) fill(null)",
           "rawQuery": false,
           "refId": "B",
           "resultFormat": "time_series",
@@ -2159,7 +2159,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "inverter"
             }
@@ -2185,7 +2185,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"value\") / 1000 FROM \"activePower\" WHERE (\"device\" = 'house_energy_meter') AND $timeFilter GROUP BY time(5m) fill(null)",
+          "query": "SELECT mean(\"value\") / 1000 FROM \"activePower\" WHERE (\"description\" = 'house_energy_meter') AND $timeFilter GROUP BY time(5m) fill(null)",
           "rawQuery": false,
           "refId": "C",
           "resultFormat": "time_series",
@@ -2205,7 +2205,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "house_energy_meter"
             }
@@ -2218,7 +2218,7 @@
           "measurement": "activePower",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"value\") / 1000 FROM \"activePower\" WHERE (\"device\" = 'house_energy_meter') AND $timeFilter GROUP BY time(5m) fill(null)",
+          "query": "SELECT mean(\"value\") / 1000 FROM \"activePower\" WHERE (\"description\" = 'house_energy_meter') AND $timeFilter GROUP BY time(5m) fill(null)",
           "rawQuery": false,
           "refId": "D",
           "resultFormat": "time_series",
@@ -2234,7 +2234,7 @@
           ],
           "tags": [
             {
-              "key": "device",
+              "key": "description",
               "operator": "=",
               "value": "hp_energy_meter"
             }
