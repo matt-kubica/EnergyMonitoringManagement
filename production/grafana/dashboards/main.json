@@ -15,11 +15,11 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
-      "datasource": null,
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -108,7 +108,7 @@
       "type": "gauge"
     },
     {
-      "datasource": null,
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -197,7 +197,7 @@
       "type": "gauge"
     },
     {
-      "datasource": null,
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -286,7 +286,7 @@
       "type": "gauge"
     },
     {
-      "datasource": null,
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -375,7 +375,7 @@
       "type": "gauge"
     },
     {
-      "datasource": null,
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1897,7 +1897,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": null,
+      "datasource": "InfluxDB",
       "decimals": 3,
       "fieldConfig": {
         "defaults": {
@@ -2284,7 +2284,7 @@
       }
     }
   ],
-  "refresh": false,
+  "refresh": true,
   "schemaVersion": 26,
   "style": "dark",
   "tags": [],
