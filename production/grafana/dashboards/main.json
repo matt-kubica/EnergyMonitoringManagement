@@ -15,6 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
+  "id": null,
   "links": [],
   "panels": [
     {
@@ -513,7 +514,7 @@
       "pluginVersion": "7.1.5",
       "targets": [
         {
-          "alias": "Moc Pompa Stacja Ładowania",
+          "alias": "Moc Stacja Ładowania EV",
           "groupBy": [],
           "measurement": "activePower",
           "orderByTime": "ASC",
@@ -547,7 +548,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Moc Pobierana Stacja Ładowania",
+      "title": "Moc Pobierana Ładowanie EV",
       "transparent": true,
       "type": "gauge"
     },
@@ -609,23 +610,19 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "$$hashKey": "object:3019",
           "alias": "Energia Zużyta Dom",
           "transform": "negative-Y"
         },
         {
-          "$$hashKey": "object:3021",
           "alias": "Energia Zużyta Pompa Ciepła",
           "lines": false,
           "transform": "negative-Y"
         },
         {
-          "$$hashKey": "object:3024",
           "alias": "Energia Wyprodukowana Falownik",
           "lines": false
         },
         {
-          "$$hashKey": "object:3063",
           "alias": "Energia Zużyta Stacja Ładowania",
           "transform": "negative-Y"
         }
@@ -645,7 +642,7 @@
             },
             {
               "params": [
-                "null"
+                "linear"
               ],
               "type": "fill"
             }
@@ -1226,12 +1223,15 @@
         "ActiveEnergyConsumed MainEnergyMeter": "semi-dark-red",
         "ActiveEnergyProduced Inverter": "semi-dark-yellow",
         "ActiveEnergyProduced MainEnergyMeter": "semi-dark-green",
+        "Energia Stacja Ładowania": "yellow",
         "Energia Wyprodukowana": "semi-dark-yellow",
         "Energia Wyprodukowana Falownik": "semi-dark-orange",
         "Energia Wyprodukowana Licznik Główny": "dark-yellow",
         "Energia Zużyta Dom": "semi-dark-red",
         "Energia Zużyta Licznik Główny": "semi-dark-blue",
-        "Energia Zużyta Pompa Ciepła": "dark-purple"
+        "Energia Zużyta Pompa Ciepła": "dark-purple",
+        "Energia Zużyta Stacja Ładowania": "yellow",
+        "Energia Zużyta Stacja Ładowania EV": "yellow"
       },
       "bars": true,
       "dashLength": 10,
@@ -1278,18 +1278,15 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "$$hashKey": "object:3293",
           "alias": "Energia Zużyta Dom",
           "transform": "negative-Y"
         },
         {
-          "$$hashKey": "object:3294",
           "alias": "Energia Zużyta Pompa Ciepła",
           "transform": "negative-Y"
         },
         {
-          "$$hashKey": "object:3350",
-          "alias": "Energia Zużyta Stacja Ładowania",
+          "alias": "Energia Zużyta Stacja Ładowania EV",
           "transform": "negative-Y"
         }
       ],
@@ -1440,7 +1437,7 @@
           ]
         },
         {
-          "alias": "Energia Stacja Ładowania",
+          "alias": "Energia Zużyta Stacja Ładowania EV",
           "groupBy": [
             {
               "params": [
@@ -2578,4 +2575,4 @@
   "title": "Gospodarstwo Domowe - Bilans Energetyczny",
   "uid": "7gcYMLoWk",
   "version": 2
-}
+}}
