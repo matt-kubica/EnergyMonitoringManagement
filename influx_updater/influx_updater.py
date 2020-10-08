@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import logging
+import logging.handlers
 import psycopg2
 import sys
 import time
@@ -28,12 +29,30 @@ class InfluxUpdater():
 
     def logger_config(self):
         self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+
         stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s\t%(filename)s\t%(levelname)s\t%(message)s')
         stream_handler.setFormatter(formatter)
-
         self.logger.addHandler(stream_handler)
-        self.logger.setLevel(logging.DEBUG)
+
+
+        if os.environ.get('EMAIL_NOTIFICATIONS').upper() == 'TRUE': 
+            smtp_handler = logging.handlers.SMTPHandler(
+                mailhost=(os.environ.get("LOGGER_SENDER_EMAIL_HOST"), os.environ.get("LOGGER_SENDER_EMAIL_PORT")),
+                fromaddr=os.environ.get("LOGGER_SENDER_EMAIL_ADDRESS"),
+                toaddrs=[os.environ.get("LOGGER_RECEIVER_EMAIL_ADDRESS")],
+                subject=os.environ.get("LOGGER_NOTIFICATION_EMAIL_SUBJECT"),
+                credentials=(os.environ.get("LOGGER_SENDER_EMAIL_ADDRESS"), os.environ.get("LOGGER_SENDER_EMAIL_PASSWORD")),
+                secure=()
+            )
+            smtp_handler.setLevel(logging.ERROR)
+            formatter = logging.Formatter('%(asctime)s\t%(filename)s\t%(levelname)s\t%(message)s')
+            smtp_handler.setFormatter(formatter)
+            self.logger.addHandler(smtp_handler)
+
+        
 
 
     def scheduler_config(self):
@@ -204,11 +223,12 @@ class InfluxUpdater():
         if len(data_points_list) != 0:
             self.logger.info('Updated influx with data from ({0})'.format(energy_meter))
         else:
-            self.logger.info('No data retrieved from ({0})'.format(energy_meter))
+            self.logger.error('No data retrieved from ({0})'.format(energy_meter))
 
 
 
     def start(self):
+
         self.connect_psql()
         self.connect_influx()
         self.scheduler.start()
