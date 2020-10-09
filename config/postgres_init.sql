@@ -19,27 +19,55 @@ CREATE TABLE registers(
 );
 
 
-
-
-INSERT INTO registers VALUES(
-	'virtual_modbustcp_server',
-	0,
-	'test_measurement',
-	't-unit',
-	3,
-	4,
-	2,
-	2
-);
+COPY registers
+FROM '/data/registers.csv' 
+DELIMITER ',' 
+CSV HEADER;
 
 
 INSERT INTO energy_meters VALUES(
-	0,
-	'virtual_modbustcp_server',
+	1,
+	'178.218.234.100',
+	2140,
+	1,
+	'sdm630',
+	'main_energy_meter'
+);
+
+INSERT INTO energy_meters VALUES(
+	2,
+	'178.218.234.100',
+	2140,
+	2,
+	'sdm630',
+	'house_energy_meter'
+);
+
+INSERT INTO energy_meters VALUES(
+	3,
+	'178.218.234.100',
+	2141,
+	1,
+	'le03mwct',
+	'hp_energy_meter'
+);
+
+INSERT INTO energy_meters VALUES(
+	4,
+	'virtual_tlc10000_server',
 	502,
 	0,
-	'virtual_modbustcp_server',
-	'test_energy_meter'
+	'virtual-tlc10000',
+	'inverter'
+);
+
+INSERT INTO energy_meters VALUES(
+	5,
+	'178.218.234.100',
+	2139,
+	1,
+	'sdm630',
+	'charger_energy_meter'
 );
 
 

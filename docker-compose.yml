@@ -9,7 +9,7 @@ services:
     volumes:
       - ./influx_updater:/app
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env
     depends_on:
       - db
       - influx
@@ -26,9 +26,10 @@ services:
       - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - ./dev/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./config/registers.csv:/data/registers.csv
+      - ./config/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env
     networks:
       - default_network
 
@@ -41,7 +42,7 @@ services:
     volumes:
       - influxdb_data:/var/lib/influxdb/data
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env
     networks:
       - default_network
 
@@ -52,22 +53,21 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./dev/grafana:/etc/grafana/provisioning
+      - ./config/grafana:/etc/grafana/provisioning
     networks:
       - default_network
 
   virtual_modbustcp:
-    container_name: virtual_modbustcp_server
-    build: ./virtual_modbustcp_server
-    command: python test.py
-    restart: unless-stopped
+    container_name: virtual_tlc10000_server
+    build: ./virtual_tlc10000_server
+    command: python -u virtual_tlc10000_server.py
     ports:
       - 502:502
     env_file:
-     - ./dev/.env.dev
+      - ./config/.env
     networks:
       - default_network
 

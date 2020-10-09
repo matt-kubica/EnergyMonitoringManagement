@@ -8,7 +8,7 @@ datasources:
     url: http://influx_db:8086
     basicAuth: true
     basicAuthUser: admin
-    basicAuthPassword: admin
-    database: influx_default
+    basicAuthPassword: hem_influx_420
+    database: home_energy_monitoring
     jsonData:
       httpMode: GET
