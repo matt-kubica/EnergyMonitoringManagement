@@ -9,7 +9,7 @@ services:
     volumes:
       - ./influx_updater:/app
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env.dev
     depends_on:
       - db
       - influx
@@ -26,9 +26,9 @@ services:
       - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - ./dev/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./config/postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env.dev
     networks:
       - default_network
 
@@ -41,7 +41,7 @@ services:
     volumes:
       - influxdb_data:/var/lib/influxdb/data
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env.dev
     networks:
       - default_network
 
@@ -52,10 +52,10 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - ./dev/.env.dev
+      - ./config/.env.dev
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./dev/grafana:/etc/grafana/provisioning
+      - ./config/grafana:/etc/grafana/provisioning
     networks:
       - default_network
 
@@ -67,7 +67,7 @@ services:
     ports:
       - 502:502
     env_file:
-     - ./dev/.env.dev
+     - ./config/.env.dev
     networks:
       - default_network
 
