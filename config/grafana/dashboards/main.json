@@ -615,15 +615,12 @@
         },
         {
           "alias": "Energia Zużyta Pompa Ciepła",
-          "lines": false,
+          "stack": true,
           "transform": "negative-Y"
         },
         {
-          "alias": "Energia Wyprodukowana Falownik",
-          "lines": false
-        },
-        {
           "alias": "Energia Zużyta Stacja Ładowania",
+          "stack": true,
           "transform": "negative-Y"
         }
       ],
@@ -1283,10 +1280,12 @@
         },
         {
           "alias": "Energia Zużyta Pompa Ciepła",
+          "stack": true,
           "transform": "negative-Y"
         },
         {
           "alias": "Energia Zużyta Stacja Ładowania EV",
+          "stack": true,
           "transform": "negative-Y"
         }
       ],
@@ -2774,7 +2773,7 @@
       }
     }
   ],
-  "refresh": "5s",
+  "refresh": false,
   "schemaVersion": 26,
   "style": "dark",
   "tags": [],
@@ -2782,8 +2781,8 @@
     "list": []
   },
   "time": {
-    "from": "now-7d",
-    "to": "now"
+    "from": "2020-10-04T22:00:00.000Z",
+    "to": "2020-10-12T21:59:59.000Z"
   },
   "timepicker": {
     "refresh_intervals": [
