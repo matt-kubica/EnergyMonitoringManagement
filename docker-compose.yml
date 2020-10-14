@@ -2,12 +2,12 @@ version: '3.3'
 
 services:
   influx_updater:
-    container_name: influx_updater
-    build: ./influx_updater
-    command: sh -c "dockerize -wait tcp://db:5432 python influx_updater.py"
+    container_name_legacy: influx_updater_legacy
+    build: ./influx_updater_legacy
+    command: sh -c "dockerize -wait tcp://db:5432 python influx_updater_legacy.py"
     restart: unless-stopped
     volumes:
-      - ./influx_updater:/app
+      - ./influx_updater_legacy:/app
     env_file:
       - ./config/.env
     depends_on:
