@@ -10,6 +10,7 @@ django = "*"
 influxdb = "*"
 pymodbus = "*"
 apscheduler = "*"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.7"

@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'influxdb',
     'pymodbus',
     'apscheduler',
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [
