@@ -13,7 +13,7 @@ class EnergyMeter(models.Model):
     description = models.CharField(max_length=128, null=True)
 
     class Meta:
-        unique_together = ('ip', 'port', 'slave_address',)
+        unique_together = ('host', 'port', 'slave_address',)
 
     def __str__(self):
         return '{0}:{1}:{2} ({3})'.format(self.host, self.port, self.slave_address, self.description)
