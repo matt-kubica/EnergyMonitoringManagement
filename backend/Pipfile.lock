@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a0e01fe795aaaab2263cabf040707a9f59b1828d22a31df26ad302fc7d5130d3"
+            "sha256": "43f44c7a70a0c0544d5e2da05674169b52462fc2df7330b1de0d3d30218fb18e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -122,6 +122,13 @@
             ],
             "index": "pypi",
             "version": "==3.1.2"
+        },
+        "django-apscheduler": {
+            "hashes": [
+                "sha256:9f00a68e5e4481e3df7088d4386bd1d2f1a2d17c3e8edd78e04554761faee49d"
+            ],
+            "index": "pypi",
+            "version": "==0.5.0"
         },
         "django-rest-knox": {
             "hashes": [
