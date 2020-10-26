@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'influx_updater',
     'management_api',
+    'accounts',
 
     'influxdb',
     'pymodbus',
