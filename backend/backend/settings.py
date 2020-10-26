@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from rest_framework.settings import api_settings
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -46,9 +47,9 @@ INSTALLED_APPS = [
 
     'influxdb',
     'pymodbus',
-    'apscheduler',
+    'django_apscheduler',
     'rest_framework',
-    'knox'
+    'knox',
 
 ]
 
@@ -68,6 +69,19 @@ REST_KNOX = {
   'AUTO_REFRESH': False,
   'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
 }
+
+# This scheduler config will:
+# - Store jobs in the project database
+# - Execute jobs in threads inside the application process
+SCHEDULER_CONFIG = {
+    "apscheduler.jobstores.default": {
+        "class": "django_apscheduler.jobstores:DjangoJobStore"
+    },
+    'apscheduler.executors.processpool': {
+        "type": "threadpool"
+    },
+}
+SCHEDULER_AUTOSTART = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
