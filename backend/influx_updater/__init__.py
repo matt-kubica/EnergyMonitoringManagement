@@ -1,0 +1,1 @@
+default_app_config = 'influx_updater.apps.InfluxUpdaterConfig'
