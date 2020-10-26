@@ -42,9 +42,9 @@ class Assigment(models.Model):
     meter_id = models.ForeignKey(EnergyMeter, on_delete=models.CASCADE)
     register_id = models.ForeignKey(Register, on_delete=models.CASCADE)
 
-    hour_trigger = models.CharField(max_length=4, null=False, default=os.environ.get("DEFAULT_CRON_HOUR_TRIGGER"))
-    minute_trigger = models.CharField(max_length=4, null=False, default=os.environ.get("DEFAULT_CRON_MINUTE_TRIGGER"))
-    second_trigger = models.CharField(max_length=4, null=False, default=os.environ.get("DEFAULT_CRON_SECOND_TRIGGER"))
+    hour_trigger = models.CharField(max_length=4, null=False, default=os.environ.get('DEFAULT_CRON_HOUR_TRIGGER', '*'))
+    minute_trigger = models.CharField(max_length=4, null=False, default=os.environ.get('DEFAULT_CRON_MINUTE_TRIGGER', '*/5'))
+    second_trigger = models.CharField(max_length=4, null=False, default=os.environ.get('DEFAULT_CRON_SECOND_TRIGGER', '0'))
 
     class Meta:
         unique_together = ('meter_id', 'register_id', )

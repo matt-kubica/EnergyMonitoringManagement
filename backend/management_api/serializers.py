@@ -19,7 +19,7 @@ class SparseRegisterSerializer(ModelSerializer):
         fields = ('id', 'meter_type', 'register_address', 'measurement_name')
 
 
-class AssigmentSerializer(ModelSerializer):
+class AssignmentSerializer(ModelSerializer):
     class Meta:
         model = Assigment
         fields = '__all__'

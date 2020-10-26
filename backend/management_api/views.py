@@ -1,5 +1,5 @@
 from .models import EnergyMeter, Register, Assigment
-from .serializers import EnergyMeterSerializer, RegisterSerializer, SparseRegisterSerializer
+from .serializers import EnergyMeterSerializer, RegisterSerializer, SparseRegisterSerializer, AssignmentSerializer
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -82,3 +82,51 @@ class RegisterDetailAPI(APIView):
             return Response({'error': 'Cannot find register with pk = {0}'.format(pk)}, status=status.HTTP_404_NOT_FOUND)
 
     # TODO: patch
+
+
+class AssignmentsAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        registers = Assigment.objects.all()
+        serializer = AssignmentSerializer(registers, many=True)
+        return Response(serializer.data)
+
+    # TODO: hook for adding assignment
+    def post(self, request, format=None):
+        serializer = AssignmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AssignmentDetailAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk, format=None):
+        try:
+            assignment = Assigment.objects.get(pk=pk)
+        except Assigment.DoesNotExist:
+            return Response({'error': 'Cannot find register with pk = {0}'.format(pk)}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AssignmentSerializer(assignment)
+        return Response(serializer.data)
+
+    # TODO: hook for deleting assignment
+    def delete(self, request, pk, format=None):
+        try:
+            assignment = Assigment.objects.get(pk=pk)
+            assignment.delete()
+            return Response({'info': 'Register with id {0} has been deleted'.format(pk)}, status=status.HTTP_200_OK)
+        except Assigment.DoesNotExist:
+            return Response({'error': 'Cannot find register with pk = {0}'.format(pk)}, status=status.HTTP_404_NOT_FOUND)
+
+        # TODO: patch
+
+class AssignmentsByMeterAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk, format=None):
+        registers = Assigment.objects.filter(meter_id=pk)
+        serializer = AssignmentSerializer(registers, many=True)
+        return Response(serializer.data)
+
