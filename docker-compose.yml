@@ -64,6 +64,7 @@ services:
     container_name: virtual_tlc10000_server
     build: ./virtual_tlc10000_server
     command: python -u virtual_tlc10000_server.py
+    restart: unless-stopped
     ports:
       - 502:502
     env_file:

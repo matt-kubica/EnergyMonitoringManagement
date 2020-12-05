@@ -28,13 +28,13 @@ class VirtualTLC10000(VirtualModbusTCPServer):
         builder = BinaryPayloadBuilder(byteorder=Endian.Big, wordorder=Endian.Big)
         power = get_power()
         energy_today = get_energy_today()
-        energy_total = get_energy_total()
+        # energy_total = get_energy_total()
 
-        logger.debug('Power = {0}, EnergyToday = {1}, EnergyTotal = {2}'. format(power, energy_today, energy_total))
+        # logger.debug('Power = {0}, EnergyToday = {1}, EnergyTotal = {2}'. format(power, energy_today, energy_total))
 
         builder.add_32bit_float(power)
         builder.add_32bit_float(energy_today)
-        builder.add_32bit_float(energy_total)
+        # builder.add_32bit_float(energy_total)
 
         self.store.setValues(FUNCTION_CODE, ADDRESS, builder.to_registers())
         logger.info('Data store updated')
