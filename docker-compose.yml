@@ -22,8 +22,6 @@ services:
     container_name: default_db
     image: postgres:12.0
     restart: unless-stopped
-    ports:
-      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
       - ./config/registers.csv:/data/registers.csv
@@ -37,8 +35,6 @@ services:
     container_name: influx_db
     image: influxdb:1.8.0
     restart: unless-stopped
-    ports:
-      - 8086:8086
     volumes:
       - influxdb_data:/var/lib/influxdb/data
     env_file:
@@ -65,8 +61,6 @@ services:
     build: ./virtual_tlc10000_server
     command: python -u virtual_tlc10000_server.py
     restart: unless-stopped
-    ports:
-      - 502:502
     env_file:
       - ./config/.env
     networks:
